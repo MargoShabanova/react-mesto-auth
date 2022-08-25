@@ -16,3 +16,10 @@
         max-width: 280px;
     }
 }
+
+@media (max-width: 530px) {
+    .header__email {
+        font-size: 18px;
+        line-height: 22px;
+    }
+}

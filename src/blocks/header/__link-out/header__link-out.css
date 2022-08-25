@@ -10,3 +10,15 @@
     text-decoration: none;
     align-self: center;
 }
+
+.header__link-out:hover {
+    opacity: 0.8;
+    transition: 0.4s;
+}
+
+@media (max-width: 530px) {
+    .header__link-out {
+        font-size: 18px;
+        line-height: 22px;
+    }
+}
