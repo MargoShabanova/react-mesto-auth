@@ -6,4 +6,4 @@
 
 **GitHub Pages**
 
-* [Ссылка на проект Mesto](https://margoshabanova.github.io/mesto/index.html)
+* [Ссылка на проект](https://margoshabanova.github.io/react-mesto-auth/)
