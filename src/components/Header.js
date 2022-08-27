@@ -1,7 +1,7 @@
 import { NavLink, Route, Switch } from "react-router-dom";
 import logoMesto from "../images/logo.svg";
 
-function Header({ loggedOut, email }) {
+function Header({ logOut, email }) {
   return (
     <header className="header">
       <img className="header__logo" src={logoMesto} alt="логотип Mesto" />
@@ -12,7 +12,7 @@ function Header({ loggedOut, email }) {
             <NavLink
               to="/sign-in"
               className="header__link-out"
-              onClick={loggedOut}
+              onClick={logOut}
             >
               Выйти
             </NavLink>

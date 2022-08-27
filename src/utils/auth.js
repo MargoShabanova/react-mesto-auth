@@ -12,30 +12,27 @@ class Auth {
     }
   }
 
-signUp( email, password ) {
+  signUp(email, password) {
     return fetch(`${this._baseUrl}/signup`, {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify({ password, email }),
-    })
-      .then(this._checkResponse)
-      .catch(err => console.log(err));
+    }).then(this._checkResponse);
   }
 
-  signIn( email, password ) {
+  signIn(email, password) {
     return fetch(`${this._baseUrl}/signin`, {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify({ password, email }),
     })
       .then(this._checkResponse)
-      .then(data => {
-        if(data.token) {
-          localStorage.setItem('jwt', data.token)
-          return data
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("jwt", data.token);
+          return data;
         }
-      })
-      .catch(err => console.log(err));
+      });
   }
 
   getContent(token) {
@@ -45,9 +42,7 @@ signUp( email, password ) {
         ...this._headers,
         "Authorization": `Bearer ${token}`,
       },
-    })
-      .then(this._checkResponse)
-      .catch(err => console.log(err));
+    }).then(this._checkResponse);
   }
 }
 

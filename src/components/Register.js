@@ -1,18 +1,9 @@
 import { useState } from "react";
-import { auth } from "../utils/auth";
-import InfoTooltip from "./InfoTooltip";
-import { useHistory } from "react-router-dom";
 
-export default function Register() {
-  const history = useHistory();
+export default function Register({ handleRegister}) {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
-  });
-
-  const [isTooltip, setIsTooltip] = useState({
-    isOpen: false,
-    isSuccess: false,
   });
 
   function handleChange(e) {
@@ -27,33 +18,8 @@ export default function Register() {
   function handleSubmit(e) {
     e.preventDefault();
 
-    auth
-      .signUp(userData.email, userData.password)
-      .then(() => {
-        setIsTooltip({
-          ...isTooltip,
-          isOpen: true,
-          isSuccess: true,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsTooltip({
-          ...isTooltip,
-          isOpen: true,
-          isSuccess: false,
-        });
-      });
-  }
-
-  function handleCloseTooltip() {
-    setIsTooltip({
-      ...isTooltip,
-      isOpen: false,
-    });
-    if (isTooltip.isSuccess) {
-      history.push("/sign-in");
-    }
+    const { email, password } = userData;
+    handleRegister(email, password);
   }
 
   return (
@@ -89,17 +55,12 @@ export default function Register() {
             Зарегистрироваться
           </button>
           <div className="form__link-container">
-            <a className="form__link" href="/sing-in">
+            <a className="form__link" href="/sign-in">
               Уже зарегистрированы? Войти
             </a>
           </div>
         </form>
       </main>
-      <InfoTooltip
-        isOpen={isTooltip.isOpen}
-        onClose={handleCloseTooltip}
-        isSuccess={isTooltip.isSuccess}
-      />
     </>
   );
 }

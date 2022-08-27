@@ -1,17 +1,10 @@
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
-import { auth } from "../utils/auth";
-import InfoTooltip from "./InfoTooltip";
 
 export default function Login({ handleLogin }) {
-  const history = useHistory();
-
   const [userData, setUserData] = useState({
     email: "",
     password: "",
   });
-
-  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -28,27 +21,8 @@ export default function Login({ handleLogin }) {
     if (!userData.email || !userData.password) {
       return;
     }
-    auth
-      .signIn(userData.email, userData.password)
-      .then((data) => {
-        if (data.token) {
-          localStorage.setItem("jwt", data.token);
-          setUserData({
-            email: "",
-            password: "",
-          });
-          handleLogin();
-          history.push("/main");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsTooltipOpen(true);
-      });
-  }
-
-  function handleCloseTooltip() {
-    setIsTooltipOpen(false);
+    const { email, password } = userData;
+    handleLogin(email, password);
   }
 
   return (
@@ -85,11 +59,6 @@ export default function Login({ handleLogin }) {
           </fieldset>
         </form>
       </main>
-      <InfoTooltip
-        isOpen={isTooltipOpen}
-        onClose={handleCloseTooltip}
-        isSuccess={false}
-      />
     </>
   );
 }

@@ -14,6 +14,9 @@ import { api } from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import ProtectedRoute from "./ProtectedRoute";
 import { auth } from "../utils/auth";
+import InfoTooltip from "./InfoTooltip";
+import imageSuccess from "../images/success.svg";
+import imageError from "../images/error.svg";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -25,43 +28,106 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isTooltip, setIsTooltip] = useState({
+    isOpen: false,
+    isSuccess: false,
+    resImage: null,
+    resAlt: "",
+    resText: "",
+  });
   const [userData, setUserData] = useState({
     email: "",
     password: "",
   });
-  
+
   const history = useHistory();
 
-  const handleLogin = () => {
-    setLoggedIn(true);
+  const handleRegister = (email, password) => {
+    auth
+      .signUp(email, password)
+      .then((res) => {
+        if (res) {
+          setIsTooltip({
+            isOpen: true,
+            isSuccess: true,
+            resImage: imageSuccess,
+            resAlt: "Успешно",
+            resText: "Вы успешно зарегистрировались!",
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsTooltip({
+          isOpen: true,
+          isSuccess: false,
+          resImage: imageError,
+          resAlt: "Ошибка",
+          resText: "Что-то пошло не так! Попробуйте ещё раз.",
+        });
+      });
   };
 
-  const tokenCheck = () => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      auth.getContent(jwt).then((res) => {
-        if (res && res.data.email) {
-          setUserData({
-            email: res.data.email,
-          });
+  const handleLogin = (email, password) => {
+    auth
+      .signIn(email, password)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("jwt", data.token);
           setLoggedIn(true);
           history.push("/main");
-        } else {
-          history.push("/sign-in");
         }
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsTooltip({
+          isOpen: true,
+          isSuccess: false,
+          resImage: imageError,
+          resAlt: "Ошибка",
+          resText: "Что-то пошло не так! Попробуйте ещё раз.",
+        });
       });
+    setUserData({
+      email: email,
+    });
+  };
+
+  const checkToken = () => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      auth
+        .getContent(jwt)
+        .then((res) => {
+          if (res) {
+            setUserData({
+              email: res.data.email,
+            });
+            setLoggedIn(true);
+            history.push("/main");
+          } else {
+            localStorage.removeItem("jwt");
+            history.push("/sign-in");
+          }
+        })
+        .catch((err) => console.log(err));
     }
   };
 
   useEffect(() => {
-    tokenCheck();
-    Promise.all([api.getProfile(), api.getInitialCards()])
-      .then(([currentUser, initialCards]) => {
-        setCurrentUser(currentUser);
-        setCards(initialCards);
-      })
-      .catch((err) => console.log(err));
+    checkToken();
   }, []);
+
+  useEffect(() => {
+    if (loggedIn) {
+      Promise.all([api.getProfile(), api.getInitialCards()])
+        .then(([currentUser, initialCards]) => {
+          setCurrentUser(currentUser);
+          setCards(initialCards);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [loggedIn]);
 
   const handleSignOut = () => {
     localStorage.removeItem("jwt");
@@ -71,6 +137,16 @@ function App() {
     });
     setLoggedIn(false);
     history.push("/sign-in");
+  };
+
+  const handleCloseTooltip = () => {
+    setIsTooltip({
+      ...isTooltip,
+      isOpen: false,
+    });
+    if (isTooltip.isSuccess) {
+      history.push("/sign-in");
+    }
   };
 
   const handleEditProfileClick = () => {
@@ -158,7 +234,7 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header loggedOut={handleSignOut} email={userData.email} />
+        <Header logOut={handleSignOut} email={userData.email} />
         <Switch>
           <ProtectedRoute
             path="/main"
@@ -173,7 +249,7 @@ function App() {
             cards={cards}
           />
           <Route path="/sign-up">
-            <Register />
+            <Register handleRegister={handleRegister} />
           </Route>
           <Route path="/sign-in">
             <Login handleLogin={handleLogin} />
@@ -208,6 +284,14 @@ function App() {
           onClose={closeAllPopups}
           onDeleteCard={handleCardDelete}
           card={selectedForDeletionCard}
+        />
+        <InfoTooltip
+          isOpen={isTooltip.isOpen}
+          onClose={handleCloseTooltip}
+          isSuccess={isTooltip.isSuccess}
+          resImage={isTooltip.resImage}
+          resAlt={isTooltip.resAlt}
+          resText={isTooltip.resText}
         />
       </div>
     </CurrentUserContext.Provider>

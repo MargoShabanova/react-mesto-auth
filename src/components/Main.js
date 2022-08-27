@@ -30,7 +30,6 @@ export default function Main({
         <div className="profile__container">
           <div
             className="profile__avatar-button"
-            type="button"
             onClick={onEditAvatar}
           >
             <img
