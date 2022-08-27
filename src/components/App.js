@@ -76,6 +76,9 @@ function App() {
           localStorage.setItem("jwt", data.token);
           setLoggedIn(true);
           history.push("/main");
+          setUserData({
+            email: email,
+          });
         }
       })
       .catch((err) => {
@@ -88,9 +91,6 @@ function App() {
           resText: "Что-то пошло не так! Попробуйте ещё раз.",
         });
       });
-    setUserData({
-      email: email,
-    });
   };
 
   const checkToken = () => {
